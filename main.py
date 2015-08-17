@@ -13,7 +13,11 @@ dirname = tkFileDialog.askdirectory(parent=root,  title='Please select a directo
 
 def cls():
     ''' clears the terminal '''
+    if os.name == 'nt':
+        os.system("cls")
+        return None
     os.system("clear")
+
 
 def getcoverURL(search,resultCount=10):
     '''
@@ -207,7 +211,7 @@ def setTag(mp3,type):
     elif type == "title":
         mp3.tag.title = unicode(getTag(mp3,'title'))
     elif type == "track":
-        mp3.tag.track_num = (getTag(mp3,'track_num'), getTag(mp3,'total_track'))
+        mp3.tag.track_num = (getTag(mp3,'track_num'), getFinalTag(mp3,'total_track'))
     elif type == "genre":
         mp3.tag.genre = unicode(getTag(mp3,'genre'))
     elif type == "year":
@@ -318,7 +322,16 @@ for i in mp3files:
     # After using tag.clear() method, need to supply file name to save tag
     aud.tag.save(dirname+"/"+i,version=(1,None,None))
     aud.tag.save(dirname+"/"+i,version=(2,4,0))
-
+	
     # Finally, Rename file as format '%tn %title'
     new_name = dirname+"/"+str(aud.tag.track_num[0])+" "+aud.tag.title+".mp3"
     os.rename(dirname+"/"+i, new_name)
+
+#Copy coverart.jpg as folder.jpg, to update folder thumbnail in Windows
+if os.name == 'nt':
+    os.chdir(dirname)
+    if os.system('copy coverart.jpg folder.jpg') == 1:
+        os.system('attrib -s -h folder.jpg')
+        os.system('del folder.jpg')
+        os.system('copy coverart.jpg folder.jpg')
+    os.system('attrib +s +h folder.jpg')
