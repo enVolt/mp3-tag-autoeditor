@@ -16,3 +16,11 @@ def cls():
         os_system("cls")
         return None
     os_system("clear")
+
+
+def clearlog():
+    '''
+    Overwrite log.txt (empties)
+    '''
+    f = open("log.txt", "w+")
+    f.close()
