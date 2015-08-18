@@ -100,11 +100,11 @@ def getFinalTag(mp3, type):
     '''
     if type == "album":
         try:
-            album
+            final_album
         except:
             return getTag(mp3, 'album')
         else:
-            return album
+            return final_album
 
     elif type == "artist":
         try:
@@ -156,7 +156,7 @@ def getFinalTag(mp3, type):
                 rsplit(" ", track_numfin)[0]
     elif type == "genre":
         try:
-            genre
+            final_genre
         except:
             return getTag(mp3, 'genre')
         else:
@@ -164,7 +164,7 @@ def getFinalTag(mp3, type):
 
     elif type == "year":
         try:
-            year
+            final_year
         except:
             return getTag(mp3, 'year')
         else:
@@ -172,7 +172,7 @@ def getFinalTag(mp3, type):
 
     elif type == "total_track":
         try:
-            total_track
+            final_total_track
         except:
             return getTag(mp3, 'total_track')
         else:
@@ -237,7 +237,7 @@ while ch != 0:
     ch = int(input())
     if ch == 1:
         ''' Abum Name '''
-        album = raw_input("Enter Album Name >> ")
+        final_album = raw_input("Enter Album Name >> ")
     elif ch == 2:
         ''' Artist Pattern '''
         while True:
@@ -262,10 +262,10 @@ while ch != 0:
                 break
     elif ch == 4:
         ''' Genre '''
-        genre = raw_input("Enter Genre >> ")
+        final_genre = raw_input("Enter Genre >> ")
     elif ch == 5:
         ''' Release Year '''
-        year = raw_input("Enter Release Year >> ")
+        final_year = raw_input("Enter Release Year >> ")
     elif ch == 6:
         ''' Album-Artist Pattern '''
         while True:
@@ -291,7 +291,7 @@ while ch != 0:
                 break
     elif ch == 8:
         ''' Total Track Number '''
-        total_track = raw_input("Enter total track number >> ")
+        final_total_track = raw_input("Enter total track number >> ")
     elif ch == 9:
         ''' Artist for all MP3s '''
         final_artist = raw_input("Enter Artist >> ")
@@ -299,7 +299,8 @@ while ch != 0:
         ''' Album-Artist for all MP3s '''
         final_album_artist = raw_input("Enter Album-Artist >> ")
     elif ch == 11:
-        image = coverimage.getCoverImage(dirname, getFinalTag(mp31, 'album'))
+        final_image = coverimage.getCoverImage(
+            dirname, getFinalTag(mp31, 'album'))
     else:
         pass
 
@@ -328,17 +329,43 @@ for i in mp3files:
     setTag(aud, genre, 'genre')
     setTag(aud, year, 'year')
     try:
-        image
+        final_image
     except:
-        image = coverimage.getCoverImage(dirname, album)
-    if image:
+        final_image = coverimage.getCoverImage(dirname, album)
+    if final_image:
         extra.log("saving cover")
-        aud.tag.images.set(3, image, "image/jpeg", u"")
+        aud.tag.images.set(3, final_image, "image/jpeg", u"")
     # Save the tags to file,
     # After using tag.clear() method, need to supply file name to save tag
     aud.tag.save(dirname+"/"+i, version=(1, None, None))
     aud.tag.save(dirname+"/"+i, version=(2, 4, 0))
     # Finally, Rename file as format '%tn %title'
     extra.log(str(aud.tag.track_num[0])+aud.tag.title)
-    new_name = dirname+"/"+str(aud.tag.track_num[0])+" "+aud.tag.title+".mp3"
-    os_rename(dirname+"/"+i, new_name)
+
+extra.cls()
+ch = raw_input("Do you wish to rename files? >> (Y/N) ").lower()
+if ch == 'y':
+    print '''\n
+    Select Pattern
+    1. <Track Number> <Title> (default)
+    2. <Artist> - <Title>\n
+    >> ''',
+    ch = raw_input()
+    for i in mp3files:
+        aud = eyed3load(dirname+"/"+i)
+        if ch == '2':
+            ren_pattern = str(aud.tag.artist)+" - "+aud.tag.title
+        else:
+            ren_pattern = str(aud.tag.track_num[0])+" "+aud.tag.title
+        new_name = dirname+"/"+ren_pattern+".mp3"
+        os_rename(dirname+"/"+i, new_name)
+
+extra.cls()
+print '''
+    All Set, Exiting the program, 
+    If you've faced any problem, please send log.txt file to author
+    Else delete that file
+
+    Press Any Key to Exit.......
+    ''',
+raw_input()
