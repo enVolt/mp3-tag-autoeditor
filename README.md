@@ -2,7 +2,9 @@
 
 A script to auto edit the ID3 Tags of songs download from DJMaza.info
 
-ignore all files, everything is in main.py
+You need main.py, coverimage.py and extra.py
+
+Coming soon, executable Windows file
 
 PS - Highly recommended to buy original tracks and listen tracks from authentic sources. (Saavn, Gaana)
 
