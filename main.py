@@ -14,7 +14,6 @@ dirname = tkFileDialog.askdirectory(
 # dirname = os.getcwd()
 
 # dirname = r'/home/ashwani/Music'
-# testing changes
 
 
 def log(s):
@@ -39,7 +38,7 @@ def getcoverURL(search, resultCount=10):
     # search = "drishyam"
     # resultCount = 10
     searchengineid = "014954134512375095903%3A1jlepwhgf1k"
-    APIKey = "Google API Key"
+    APIKey = "Get Google API Key"
 
     url = "https://www.googleapis.com/customsearch/v1?" + \
         "q="+search + \
