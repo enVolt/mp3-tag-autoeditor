@@ -27,7 +27,7 @@ Any unexpected input will crash, not tolerable to fault
 
 How this Works?
 =========================
-S0 . Update your API key in line #41
+S0 . Update your API key in line #41	
 
 S1 . Install eyed3 package (pip install eyed3)
 
