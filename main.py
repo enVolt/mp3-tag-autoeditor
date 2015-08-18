@@ -1,79 +1,34 @@
-import tkFileDialog
-import urllib
-import eyed3
-import os
-import json
-from Tkinter import *
+from tkFileDialog import askdirectory
+from eyed3 import load as eyed3load
+import coverimage
+import extra
+from os import name as os_name, system as os_system,\
+    chdir as os_chdir, listdir as os_listdir, rename as os_rename
+from Tkinter import Tk
+
+extra.cls()
+
+# Initial Welcome Message
+print '''
+
+    This program can be used to quickly edit tags.
+    Works great with MP3 folder
+
+    NOT TO BE USED WITH FOLDER, CONTAINING MP3 FROM DIFF ALBUMs
+
+    Press any key to continue, and select the folder to start the process
+
+>> ''',
+
+raw_input()
 
 root = Tk()
 root.withdraw()
 
-dirname = tkFileDialog.askdirectory(
-    parent=root, title='Please select a directory')
-
-# dirname = os.getcwd()
-
+dirname = askdirectory(parent=root, title='Please select a directory')
+extra.log("Dirname = "+dirname)
+extra.cls()
 # dirname = r'/home/ashwani/Music'
-
-
-def log(s):
-    '''
-    Make a log File for debugging
-    '''
-    print s
-
-
-def cls():
-    ''' clears the terminal '''
-    if os.name == 'nt':
-        os.system("cls")
-        return None
-    os.system("clear")
-
-
-def getcoverURL(search, resultCount=10):
-    '''
-    It will return the URL to coverart image
-    '''
-    # search = "drishyam"
-    # resultCount = 10
-    searchengineid = "014954134512375095903%3A1jlepwhgf1k"
-    APIKey = "Get Google API Key"
-
-    url = "https://www.googleapis.com/customsearch/v1?" + \
-        "q="+search + \
-        "&num="+str(resultCount) + \
-        "&cx="+searchengineid + \
-        "&key="+APIKey
-
-    log(url)
-    try:
-        source = urllib.urlopen(url)
-    except:
-        print "Can't connect to internet, unable to edit cover image"
-        return False
-    # source = open('json.txt').read()
-
-    parsedJSON = json.loads(source.read())
-
-    if parsedJSON["error"]:
-        print "Please Update API Key"
-        return False
-
-    i = 1
-    for each in parsedJSON["items"]:
-        print i, each["title"], each["displayLink"]
-        i += 1
-    print "Enter your choice\n>> ",
-    ch = int(input())
-    # ch = 4
-    url = parsedJSON["items"][ch-1]["pagemap"]["cse_image"][0]["src"]
-    if parsedJSON["items"][ch-1]["displayLink"] == "www.saavn.com":
-        pass
-    else:
-        url = url.replace("326x326", "600x600")
-
-    return url
 
 
 def getlistofMP3s(dirname):
@@ -81,32 +36,10 @@ def getlistofMP3s(dirname):
     Returns a list of MP3 file names
     '''
     l = []
-    for i in os.listdir(dirname):
+    for i in os_listdir(dirname):
         if str(i[-3:]).lower() == "mp3":
             l += [i]
     return l
-
-
-def getCoverImage(album):
-    '''
-    This function will return image as an object,
-    if coverart.jpg exists in same folder,
-    else getcoverURL method will be called on album
-    '''
-    if not os.path.isfile(dirname+"/coverart.jpg"):
-        coverurl = getcoverURL(album, 10)
-        if coverurl:
-            urllib.urlretrieve(coverurl, dirname+"/coverart.jpg")
-            imagedata = open(dirname+"/coverart.jpg", "rb").read()
-            return imagedata
-        else:
-            try:
-                imagepath
-            except:
-                imagepath = tkFileDialog.askopenfile(mode='rb')
-                return imagepath.read()
-            else:
-                return imagepath.read()
 
 
 def getTag(mp3, type):
@@ -117,39 +50,39 @@ def getTag(mp3, type):
     '''
     if type == "album":
         if mp3.tag.album is None:
-            return album
+            return ""
         else:
             return mp3.tag.album
     elif type == "artist":
         if mp3.tag.artist is None:
-            return artist
+            return ""
         else:
             return mp3.tag.artist
     elif type == "album_artist":
         if mp3.tag.album_artist is None:
-            return album_artist
+            return ""
         else:
             return mp3.tag.album_artist
     elif type == "title":
         if mp3.tag.title is None:
-            return title
+            return ""
         else:
             return mp3.tag.title
     elif type == "track_num":
         if mp3.tag.track_num[0] is None:
-            return track_num
+            return ""
         else:
             return str(mp3.tag.track_num[0])
     elif type == "genre":
         try:
             mp3.tag.genre.name
         except:
-            return genre
+            return ""
         else:
             return mp3.tag.genre.name
     elif type == "year":
         if mp3.tag.best_release_date is None:
-            return year
+            return ""
         else:
             return str(mp3.tag.best_release_date)
     elif type == "total_track":
@@ -175,33 +108,42 @@ def getFinalTag(mp3, type):
 
     elif type == "artist":
         try:
-            artistini
+            final_artist
         except:
-            return getTag(mp3, 'artist')
+            try:
+                artistini
+            except:
+                return getTag(mp3, 'artist')
+            else:
+                return getTag(mp3, 'artist'). \
+                    split(" ", artistini)[artistini]. \
+                    rsplit(" ", artistfin)[0]
         else:
-            return getTag(mp3, 'artist').split(
-                " ", artistini)[artistini].rsplit(
-                " ", artistfin)[0]
+            return final_artist
 
     elif type == "album_artist":
         try:
-            album_artistini
+            final_album_artist
         except:
-            return getTag(mp3, 'album_artist')
+            try:
+                album_artistini
+            except:
+                return getTag(mp3, 'album_artist')
+            else:
+                return getTag(mp3, 'album_artist'). \
+                    split(" ", album_artistini)[album_artistini]. \
+                    rsplit(" ", album_artistfin)[0]
         else:
-            return getTag(mp3, 'album_artist').split(
-                " ", album_artistini)[album_artistini].rsplit(
-                " ", album_artistfin)[0]
-
+            return final_album_artist
     elif type == "title":
         try:
             titleini
         except:
             return getTag(mp3, 'title')
         else:
-            return getTag(mp3, 'title').split(
-                " ", titleini)[titleini].rsplit(
-                " ", titlefin)[0]
+            return getTag(mp3, 'title'). \
+                split(" ", titleini)[titleini]. \
+                rsplit(" ", titlefin)[0]
 
     elif type == "track_num":
         try:
@@ -209,9 +151,9 @@ def getFinalTag(mp3, type):
         except:
             return getTag(mp3, 'track_num')
         else:
-            return track_num.split(
-                " ", track_numini)[track_numini].rsplit(
-                " ", track_numfin)[0]
+            return track_num. \
+                split(" ", track_numini)[track_numini]. \
+                rsplit(" ", track_numfin)[0]
     elif type == "genre":
         try:
             genre
@@ -237,31 +179,33 @@ def getFinalTag(mp3, type):
             return total_track
 
 
-def setTag(mp3, type):
+def setTag(mp3, type_value, type):
     '''
     Set tag from MP3 file (mp3 = eyed3.load("File.mp3"))
     allowed value of type 'album','artist','album_artist','title',
     'track_num','genre','year','total_track'
     '''
     if type == "album":
-        mp3.tag.album = unicode(getTag(mp3, 'album'))
+        mp3.tag.album = unicode(getFinalTag(mp3, 'album'))
     elif type == "artist":
-        mp3.tag.artist = unicode(getTag(mp3, 'artist'))
+        mp3.tag.artist = unicode(getFinalTag(mp3, 'artist'))
     elif type == "album_artist":
-        mp3.tag.album_artist = unicode(getTag(mp3, 'album_artist'))
+        mp3.tag.album_artist = unicode(getFinalTag(mp3, 'album_artist'))
     elif type == "title":
-        mp3.tag.title = unicode(getTag(mp3, 'title'))
+        mp3.tag.title = unicode(getFinalTag(mp3, 'title'))
     elif type == "track":
-        mp3.tag.track_num = (
-            getTag(mp3, 'track_num'), getFinalTag(mp3, 'total_track'))
+        # Track_num = (TrackNumber, Total Track) //Tuple
+        track_num = (getFinalTag(mp3, 'track_num'))
+        total_track = (getFinalTag(mp3, 'total_track'))
+        mp3.tag.track_num = (track_num, total_track)
     elif type == "genre":
-        mp3.tag.genre = unicode(getTag(mp3, 'genre'))
+        mp3.tag.genre = unicode(getFinalTag(mp3, 'genre'))
     elif type == "year":
-        mp3.tag.release_date = getTag(mp3, 'year')
+        mp3.tag.release_date = getFinalTag(mp3, 'year')
 
 
 def printMenu(mp31):
-    cls()
+    extra.cls()
     print '''
         +-------------------------------+
         +                               +
@@ -275,15 +219,20 @@ def printMenu(mp31):
       5. Select Year ('''+getFinalTag(mp31, 'year')+''')
       6. Edit Album-Artist Pattern ('''+getFinalTag(mp31, 'album_artist')+''')
       7. Edit Track Number Pattern ('''+getFinalTag(mp31, 'track_num')+''')
-      8. Edit Total Track Number ('''+getFinalTag(mp31, 'total_track')+''')
-      9. ~~~ Do the Magic ~~~
+      8. Select Total Track Number ('''+getFinalTag(mp31, 'total_track')+''')
+      9. Select Artist ('''+getFinalTag(mp31, 'artist')+''') (Change for all MP3s)
+     10. Select Album-Artist ('''+getFinalTag(mp31, 'album_artist')+''') (Change for all MP3s)
+     11. Select Cover-Art ('coverart.jpg' will be used by default in selected folder)
+      0. ~~~ Do the Magic ~~~
       Enter Choice >> ''',
 
 mp3files = getlistofMP3s(dirname)
-mp31 = eyed3.load(dirname+"/"+mp3files[0])
-ch = 0
+extra.log(str(mp3files))
+mp31 = eyed3load(dirname+"/"+mp3files[0])
+ch = 10
 
-while ch != 9:
+while ch != 0:
+    extra.log("Entered in loop")
     printMenu(mp31)
     ch = int(input())
     if ch == 1:
@@ -343,12 +292,20 @@ while ch != 9:
     elif ch == 8:
         ''' Total Track Number '''
         total_track = raw_input("Enter total track number >> ")
+    elif ch == 9:
+        ''' Artist for all MP3s '''
+        final_artist = raw_input("Enter Artist >> ")
+    elif ch == 10:
+        ''' Album-Artist for all MP3s '''
+        final_album_artist = raw_input("Enter Album-Artist >> ")
+    elif ch == 11:
+        image = coverimage.getCoverImage(dirname, getFinalTag(mp31, 'album'))
     else:
         pass
 
 
 for i in mp3files:
-    aud = eyed3.load(dirname+"/"+i)
+    aud = eyed3load(dirname+"/"+i)
     # Save the tags first
     title = getFinalTag(aud, 'title')
     album = getFinalTag(aud, 'album')
@@ -359,32 +316,38 @@ for i in mp3files:
     track_num = getFinalTag(aud, 'track_num')
     total_track = getFinalTag(aud, 'total_track')
     # Remove all the tags (everything)
+    extra.log("File = "+i)
+    extra.log(title+album+album_artist+artist)
     aud.tag.clear()
-    # # Update New Tags
-    setTag(aud, 'title')
-    setTag(aud, 'artist')
-    setTag(aud, 'album')
-    setTag(aud, 'album_artist')
-    setTag(aud, 'track')
-    setTag(aud, 'genre')
-    setTag(aud, 'year')
-    image = getCoverImage(album)
+    # Update New Tags
+    setTag(aud, title, 'title')
+    setTag(aud, artist, 'artist')
+    setTag(aud, album, 'album')
+    setTag(aud, album_artist, 'album_artist')
+    setTag(aud, (track_num, total_track), 'track')
+    setTag(aud, genre, 'genre')
+    setTag(aud, year, 'year')
+    try:
+        image
+    except:
+        image = coverimage.getCoverImage(dirname, album)
     if image:
-        print "saving cover"
+        extra.log("saving cover")
         aud.tag.images.set(3, image, "image/jpeg", u"")
     # Save the tags to file,
     # After using tag.clear() method, need to supply file name to save tag
     aud.tag.save(dirname+"/"+i, version=(1, None, None))
     aud.tag.save(dirname+"/"+i, version=(2, 4, 0))
     # Finally, Rename file as format '%tn %title'
+    extra.log(str(aud.tag.track_num[0])+aud.tag.title)
     new_name = dirname+"/"+str(aud.tag.track_num[0])+" "+aud.tag.title+".mp3"
-    os.rename(dirname+"/"+i, new_name)
+    os_rename(dirname+"/"+i, new_name)
 
 # Copy coverart.jpg as folder.jpg, to update folder thumbnail in Windows
-if os.name == 'nt':
-    os.chdir(dirname)
-    if os.system('copy coverart.jpg folder.jpg') == 1:
-        os.system('attrib -s -h folder.jpg')
-        os.system('del folder.jpg')
-        os.system('copy coverart.jpg folder.jpg')
-    os.system('attrib +s +h folder.jpg')
+if os_name == 'nt':
+    os_chdir(dirname)
+    if os_system('copy coverart.jpg folder.jpg') == 1:
+        os_system('attrib -s -h folder.jpg')
+        os_system('del folder.jpg')
+        os_system('copy coverart.jpg folder.jpg')
+    os_system('attrib +s +h folder.jpg')
