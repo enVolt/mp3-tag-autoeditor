@@ -342,12 +342,3 @@ for i in mp3files:
     extra.log(str(aud.tag.track_num[0])+aud.tag.title)
     new_name = dirname+"/"+str(aud.tag.track_num[0])+" "+aud.tag.title+".mp3"
     os_rename(dirname+"/"+i, new_name)
-
-# Copy coverart.jpg as folder.jpg, to update folder thumbnail in Windows
-if os_name == 'nt':
-    os_chdir(dirname)
-    if os_system('copy coverart.jpg folder.jpg') == 1:
-        os_system('attrib -s -h folder.jpg')
-        os_system('del folder.jpg')
-        os_system('copy coverart.jpg folder.jpg')
-    os_system('attrib +s +h folder.jpg')
