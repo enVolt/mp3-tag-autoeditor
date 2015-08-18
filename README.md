@@ -27,7 +27,6 @@ Any unexpected input will crash, not tolerable to fault
 
 How this Works?
 =========================
-S0 . Update your API key in line #41	
 
 S1 . Install eyed3 package (pip install eyed3)
 
@@ -39,6 +38,5 @@ S4 . Make necessary changes
 
 S5 . Do The Magic
 
-S6 . It will ask for coverart, select the title which is more similar to your album
+S6 . Done
 
-S7 . Done
