@@ -371,6 +371,7 @@ for i in mp3files:
     # Finally, Rename file as format '%tn %title'
     extra.log(aud.tag.track_num[0], aud.tag.title)
 
+# Ask if user want to rename files
 extra.cls()
 ch = raw_input("Do you wish to rename files? >> (Y/N) ").lower()
 if ch == 'y':
