@@ -1,6 +1,0 @@
-Dirname = E:/paheli
-[u'2 Tere Bin Nahi Laage.mp3', u'3 Saiyaan Superstar.mp3', u'4 Khuda Bhi.mp3', u'5 Glamorous Ankhiyaan.mp3', u'6 Main Hoon Deewana Tera.mp3', u'7 Dhol Baaje.mp3', u'8 Tere Bin Nahi Laage.mp3', u'9 Ek Do Teen Chaar.mp3']
-Entered in loop
-File = 2 Tere Bin Nahi Laage.mp3
-Tere Bin Nahi LaageEk Paheli LeelaDr Zeus, Uzair JaswalUzair Jaswal
-saving cover

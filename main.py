@@ -2,8 +2,7 @@ from tkFileDialog import askdirectory
 from eyed3 import load as eyed3load
 import coverimage
 import extra
-from os import name as os_name, system as os_system,\
-    chdir as os_chdir, listdir as os_listdir, rename as os_rename
+from os import listdir as os_listdir, rename as os_rename
 from Tkinter import Tk
 
 extra.cls()
@@ -24,11 +23,14 @@ raw_input()
 
 root = Tk()
 root.withdraw()
+extra.clearlog()
 
 dirname = askdirectory(parent=root, title='Please select a directory')
 extra.log("Dirname = "+dirname)
 extra.cls()
 # dirname = r'/home/ashwani/Music'
+final = dict()
+extra.log(str(final))
 
 
 def getlistofMP3s(dirname):
@@ -100,48 +102,48 @@ def getFinalTag(mp3, type):
     '''
     if type == "album":
         try:
-            final_album
+            final['album']
         except:
-            return getTag(mp3, 'album')
+            return album
         else:
-            return final_album
+            return final['album']
 
     elif type == "artist":
         try:
-            final_artist
+            final['artist']
         except:
             try:
                 artistini
             except:
-                return getTag(mp3, 'artist')
+                return artist
             else:
-                return getTag(mp3, 'artist'). \
+                return artist. \
                     split(" ", artistini)[artistini]. \
                     rsplit(" ", artistfin)[0]
         else:
-            return final_artist
+            return final['artist']
 
     elif type == "album_artist":
         try:
-            final_album_artist
+            final['album_artist']
         except:
             try:
                 album_artistini
             except:
-                return getTag(mp3, 'album_artist')
+                return album_artist
             else:
-                return getTag(mp3, 'album_artist'). \
+                return album_artist. \
                     split(" ", album_artistini)[album_artistini]. \
                     rsplit(" ", album_artistfin)[0]
         else:
-            return final_album_artist
+            return final['album_artist']
     elif type == "title":
         try:
             titleini
         except:
-            return getTag(mp3, 'title')
+            return title
         else:
-            return getTag(mp3, 'title'). \
+            return title. \
                 split(" ", titleini)[titleini]. \
                 rsplit(" ", titlefin)[0]
 
@@ -149,42 +151,45 @@ def getFinalTag(mp3, type):
         try:
             track_numini, track_numfin
         except:
-            return getTag(mp3, 'track_num')
+            return track_num
         else:
             return track_num. \
                 split(" ", track_numini)[track_numini]. \
                 rsplit(" ", track_numfin)[0]
     elif type == "genre":
         try:
-            final_genre
+            final['genre']
         except:
-            return getTag(mp3, 'genre')
-        else:
             return genre
+        else:
+            return final['genre']
 
     elif type == "year":
         try:
-            final_year
+            final['year']
         except:
-            return getTag(mp3, 'year')
-        else:
             return year
+        else:
+            return final['year']
 
     elif type == "total_track":
         try:
-            final_total_track
+            final['total_track']
         except:
-            return getTag(mp3, 'total_track')
-        else:
             return total_track
+        else:
+            return final['total_track']
 
 
-def setTag(mp3, type_value, type):
+def setTag(mp3, type):
     '''
     Set tag from MP3 file (mp3 = eyed3.load("File.mp3"))
     allowed value of type 'album','artist','album_artist','title',
     'track_num','genre','year','total_track'
     '''
+    if type != 'track':
+        extra.log(type, "=", getFinalTag(mp3, type))
+
     if type == "album":
         mp3.tag.album = unicode(getFinalTag(mp3, 'album'))
     elif type == "artist":
@@ -197,6 +202,7 @@ def setTag(mp3, type_value, type):
         # Track_num = (TrackNumber, Total Track) //Tuple
         track_num = (getFinalTag(mp3, 'track_num'))
         total_track = (getFinalTag(mp3, 'total_track'))
+        extra.log(type, "=", track_num, total_track)
         mp3.tag.track_num = (track_num, total_track)
     elif type == "genre":
         mp3.tag.genre = unicode(getFinalTag(mp3, 'genre'))
@@ -229,15 +235,27 @@ def printMenu(mp31):
 mp3files = getlistofMP3s(dirname)
 extra.log(str(mp3files))
 mp31 = eyed3load(dirname+"/"+mp3files[0])
+extra.log("eyed3loaded = ", mp3files[0])
+
+title = getTag(mp31, 'title')
+album = getTag(mp31, 'album')
+album_artist = getTag(mp31, 'album_artist')
+artist = getTag(mp31, 'artist')
+genre = getTag(mp31, 'genre')
+year = getTag(mp31, 'year')
+track_num = getTag(mp31, 'track_num')
+total_track = getTag(mp31, 'total_track')
+
 ch = 10
 
 while ch != 0:
-    extra.log("Entered in loop")
+    extra.log("Entered in loop ch = ", ch)
     printMenu(mp31)
     ch = int(input())
     if ch == 1:
         ''' Abum Name '''
-        final_album = raw_input("Enter Album Name >> ")
+        final['album'] = raw_input("Enter Album Name >> ")
+        extra.log('changed final[album] = '+final['album'])
     elif ch == 2:
         ''' Artist Pattern '''
         while True:
@@ -248,6 +266,7 @@ while ch != 0:
                 rsplit(" ", artistfin)[0]
             okprompt = raw_input("Is it OK ? (Y or N) >> ").lower()
             if okprompt == 'y':
+                extra.log('changed artistini,fin ', artistini, artistfin)
                 break
     elif ch == 3:
         ''' Title Pattern '''
@@ -259,13 +278,16 @@ while ch != 0:
                 rsplit(" ", titlefin)[0]
             okprompt = raw_input("Is it OK ? (Y or N) >> ").lower()
             if okprompt == 'y':
+                extra.log('changed titleini,fin', titleini, titlefin)
                 break
     elif ch == 4:
         ''' Genre '''
-        final_genre = raw_input("Enter Genre >> ")
+        final['genre'] = raw_input("Enter Genre >> ")
+        extra.log('changed final[genre] = ', final['genre'])
     elif ch == 5:
         ''' Release Year '''
-        final_year = raw_input("Enter Release Year >> ")
+        final['year'] = raw_input("Enter Release Year >> ")
+        extra.log('changed final[year] = ', final['year'])
     elif ch == 6:
         ''' Album-Artist Pattern '''
         while True:
@@ -277,6 +299,8 @@ while ch != 0:
                 rsplit(" ", album_artistfin)[0]
             okprompt = raw_input("Is it OK ? (Y or N) >> ").lower()
             if okprompt == 'y':
+                extra.log('changed al_artini,fin =',
+                          album_artistini, album_artistfin)
                 break
     elif ch == 7:
         ''' Track Number Pattern '''
@@ -288,46 +312,51 @@ while ch != 0:
                 rsplit(" ", track_numfin)[0]
             okprompt = raw_input("Is it OK ? (Y or N) >> ").lower()
             if okprompt == 'y':
+                extra.log('change track_num pattern = ',
+                          track_numini, track_numfin)
                 break
     elif ch == 8:
         ''' Total Track Number '''
-        final_total_track = raw_input("Enter total track number >> ")
+        final['total_track'] = raw_input("Enter total track number >> ")
+        extra.log("changed fina[track_num] = ", final['total_track'])
     elif ch == 9:
         ''' Artist for all MP3s '''
-        final_artist = raw_input("Enter Artist >> ")
+        final['artist'] = raw_input("Enter Artist >> ")
+        extra.log('changed final[artist] = ', final['artist'])
     elif ch == 10:
         ''' Album-Artist for all MP3s '''
-        final_album_artist = raw_input("Enter Album-Artist >> ")
+        final['album_artist'] = raw_input("Enter Album-Artist >> ")
+        extra.log('changed final[album_artist] = ', final['album_artist'])
     elif ch == 11:
         final_image = coverimage.getCoverImage(
             dirname, getFinalTag(mp31, 'album'))
     else:
         pass
 
-
 for i in mp3files:
     aud = eyed3load(dirname+"/"+i)
+    extra.log(i, " eyed3loaded")
     # Save the tags first
-    title = getFinalTag(aud, 'title')
-    album = getFinalTag(aud, 'album')
-    album_artist = getFinalTag(aud, 'album_artist')
-    artist = getFinalTag(aud, 'artist')
-    genre = getFinalTag(aud, 'genre')
-    year = getFinalTag(aud, 'year')
-    track_num = getFinalTag(aud, 'track_num')
-    total_track = getFinalTag(aud, 'total_track')
+    title = getTag(aud, 'title')
+    album = getTag(aud, 'album')
+    album_artist = getTag(aud, 'album_artist')
+    artist = getTag(aud, 'artist')
+    genre = getTag(aud, 'genre')
+    year = getTag(aud, 'year')
+    track_num = getTag(aud, 'track_num')
+    total_track = getTag(aud, 'total_track')
     # Remove all the tags (everything)
-    extra.log("File = "+i)
-    extra.log(title+album+album_artist+artist)
+    extra.log(title, album, album_artist, artist)
+    extra.log(track_num, total_track, year)
     aud.tag.clear()
     # Update New Tags
-    setTag(aud, title, 'title')
-    setTag(aud, artist, 'artist')
-    setTag(aud, album, 'album')
-    setTag(aud, album_artist, 'album_artist')
-    setTag(aud, (track_num, total_track), 'track')
-    setTag(aud, genre, 'genre')
-    setTag(aud, year, 'year')
+    setTag(aud, 'title')
+    setTag(aud, 'artist')
+    setTag(aud, 'album')
+    setTag(aud, 'album_artist')
+    setTag(aud, 'track')
+    setTag(aud, 'genre')
+    setTag(aud, 'year')
     try:
         final_image
     except:
@@ -340,7 +369,7 @@ for i in mp3files:
     aud.tag.save(dirname+"/"+i, version=(1, None, None))
     aud.tag.save(dirname+"/"+i, version=(2, 4, 0))
     # Finally, Rename file as format '%tn %title'
-    extra.log(str(aud.tag.track_num[0])+aud.tag.title)
+    extra.log(aud.tag.track_num[0], aud.tag.title)
 
 extra.cls()
 ch = raw_input("Do you wish to rename files? >> (Y/N) ").lower()

@@ -1,12 +1,15 @@
 from os import name as os_name, system as os_system
 
 
-def log(s):
+def log(*s):
     '''
     Make log of whatever you want for debugging
     '''
+    st = ""
+    for i in s:
+        st += str(i)+" "
     f = open("log.txt", "a+")
-    f.write(s+"\n")
+    f.write(st+"\n")
     f.close()
 
 

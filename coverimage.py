@@ -16,10 +16,10 @@ def getcoverURL(search, resultCount=10):
     #  and itunes.apple.com for albums
     searchengineid = "014954134512375095903%3A1jlepwhgf1k"
     APIKey = str(raw_input("Please enter your Google API Key \n \
-    	Press 0 to browse image instead from your computer\n>> "))
+        Press 0 to browse image instead from your computer\n>> "))
     if APIKey == '0':
         return False
-    print "Searching for " + search, "\n Do you wish to change album name (Y/N)?"
+    print "Searching for " + search + "\n Do you wish to change album name (Y/N)?"
     ch = str(raw_input(">> ")).lower()
     if ch == 'y':
         search = str(raw_input("Enter Album name to search\n>> "))
@@ -41,7 +41,7 @@ def getcoverURL(search, resultCount=10):
 
     parsedJSON = json_loads(source.read())
 
-    if parsedJSON["error"]:
+    if "error" in parsedJSON:
         extra.log("Please Update API Key")
         return False
 
@@ -81,3 +81,7 @@ def getCoverImage(dirname, album):
                 return imagepath.read()
             else:
                 return imagepath.read()
+    else:
+        raw_input(
+            "Using coverart.jpg as default, Press any key to continue ..... ")
+        return open(dirname+'/coverart.jpg', 'rb').read()
