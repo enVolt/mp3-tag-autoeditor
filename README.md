@@ -6,6 +6,7 @@
 1. Install eyed3 package (pip install eyed3)
 2. Download main.py, coverimage.py, extra.py from this repo
 3. Run main.py
+
 #### If you don't have Python -
 1. Download mp3-tag-autoeditor.zip 
 2. Run main.exe
